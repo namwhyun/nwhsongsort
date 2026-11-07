@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NAM WOOHYUN SONG SORT</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:white;color:#111;font-family:Arial,"Malgun Gothic",sans-serif}
+#wrap{width:min(430px,100%);margin:35px auto;padding:0 10px;text-align:center}
+#battleNumber{height:58px;padding:8px;font-size:13px;line-height:1.7}
+#mainTable{width:100%;table-layout:fixed;border-spacing:8px 4px}
+#leftField,#rightField{
+ height:160px;width:50%;border:1px solid #111;
+ padding:12px 8px;vertical-align:middle;cursor:pointer;
+ overflow-wrap:anywhere;font-size:15px;line-height:1.5;
+}
+#leftField:hover,#rightField:hover{background:#f3f3f3}
+#leftField:active,#rightField:active{background:#e5e5e5}
+#resultField{margin:28px auto;text-align:center}
+#resultTable{width:100%;max-width:340px;margin:auto;border-collapse:collapse;font-size:13px;text-align:left}
+#resultTable th{background:#111;color:white;padding:8px;text-align:center;font-weight:normal}
+#resultTable td{border:1px solid #111;padding:7px}
+#resultTable td:first-child{text-align:right;width:55px}
+button{background:white;border:1px solid #111;padding:8px 22px;cursor:pointer}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+<div id="game">
+ <div id="battleNumber"></div>
+ <table id="mainTable">
+  <tr>
+   <td id="leftField" onclick="choose(0)"></td>
+   <td id="rightField" onclick="choose(1)"></td>
+  </tr>
+ </table>
+</div>
+
+<div id="resultField"></div>
+
+</div>
+
+<script>
+
+/* =================================
+   관리자 설정: 노래 제목을 여기에 입력
+   한 줄에 한 곡씩 추가하면 됩니다.
+================================= */
+
+const SONG_LIST = [
+ "여기에 첫 번째 곡",
+ "여기에 두 번째 곡",
+ "여기에 세 번째 곡",
+ "여기에 네 번째 곡"
+];
+
+/* =================================
+   아래부터는 수정하지 않아도 됩니다.
+================================= */
+
+let runs, nextRuns;
+let runIndex, left, right;
+let a, b, merged;
+let totalComparisons = 0;
+let currentQuestion = 1;
+let finished = false;
+
+function start(){
+
+ const songs = [...new Set(
+  SONG_LIST.map(s=>s.trim()).filter(Boolean)
+ )];
+
+ if(songs.length < 2){
+  document.getElementById("battleNumber").textContent =
+  "노래 목록을 2곡 이상 등록해 주세요.";
+  document.getElementById("mainTable").classList.add("hidden");
+  return;
+ }
+
+ // 처음 순서를 무작위로 섞기
+ songs.sort(()=>Math.random()-0.5);
+
+ runs = songs.map(song=>[song]);
+ nextRuns = [];
+ runIndex = 0;
+
+ nextPair();
+}
+
+function nextPair(){
+
+ if(runIndex >= runs.length){
+
+  if(nextRuns.length === 1){
+   showResult(nextRuns[0]);
+   return;
+  }
+
+  runs = nextRuns;
+  nextRuns = [];
+  runIndex = 0;
+ }
+
+ if(runIndex + 1 >= runs.length){
+  nextRuns.push(runs[runIndex]);
+  runIndex++;
+  nextPair();
+  return;
+ }
+
+ a = runs[runIndex];
+ b = runs[runIndex+1];
+
+ left = 0;
+ right = 0;
+ merged = [];
+
+ showBattle();
+}
+
+function showBattle(){
+
+ if(left >= a.length || right >= b.length){
+  merged = merged.concat(a.slice(left));
+  merged = merged.concat(b.slice(right));
+
+  nextRuns.push(merged);
+  runIndex += 2;
+
+  nextPair();
+  return;
+ }
+
+ document.getElementById("battleNumber").innerHTML =
+ "Battle No. "+currentQuestion+
+ "<br>"+Math.round(
+ (totalComparisons / (SONG_LIST.length *
+ Math.ceil(Math.log2(SONG_LIST.length))))*100
+ )+"% sorted.";
+
+ document.getElementById("leftField").textContent = a[left];
+ document.getElementById("rightField").textContent = b[right];
+
+ currentQuestion++;
+}
+
+function choose(side){
+
+ if(finished)return;
+
+ totalComparisons++;
+
+ if(side === 0){
+  merged.push(a[left]);
+  left++;
+ }else{
+  merged.push(b[right]);
+  right++;
+ }
+
+ showBattle();
+}
+
+function showResult(ranking){
+
+ finished = true;
+
+ document.getElementById("battleNumber").innerHTML =
+ "SORT COMPLETE<br>100% sorted.";
+
+ document.getElementById("mainTable").classList.add("hidden");
+
+ const rows = ranking.map((song,index)=>
+  `<tr>
+   <td>${index+1}</td>
+   <td>${escapeHTML(song)}</td>
+  </tr>`
+ ).join("");
+
+ document.getElementById("resultField").innerHTML =
+ `<table id="resultTable">
+  <tr><th>Rank</th><th>Song</th></tr>
+  ${rows}
+ </table>
+ <p><button onclick="location.reload()">RESTART</button></p>`;
+}
+
+function escapeHTML(text){
+ return text.replace(/[&<>"']/g,char=>({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  '"':"&quot;",
+  "'":"&#39;"
+ }[char]));
+}
+
+start();
+
+</script>
+</body>
+</html>
