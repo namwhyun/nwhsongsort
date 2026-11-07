@@ -1,0 +1,563 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAM WOOHYUN SONG SORT</title>
+<style>
+:root {
+  --bg:#f7f8fa;
+  --card:#ffffff;
+  --text:#252a34;
+  --sub:#858b98;
+  --line:#e9ebef;
+  --accent:#7397c7;
+  --accent-bg:#edf3fa;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",
+  "Noto Sans KR",sans-serif;
+}
+button,textarea { font:inherit; }
+button { cursor:pointer; }
+.wrap {
+  max-width:620px;
+  margin:auto;
+  padding:35px 18px 60px;
+}
+header { text-align:center; margin-bottom:28px; }
+.logo {
+  font-size:12px;
+  letter-spacing:4px;
+  color:var(--accent);
+  font-weight:800;
+}
+h1 {
+  font-size:29px;
+  letter-spacing:1px;
+  margin:12px 0 7px;
+}
+.subtitle { color:var(--sub); font-size:13px; }
+.card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:15px;
+}
+h2 { font-size:17px; margin:0 0 15px; }
+.desc {
+  font-size:13px;
+  color:var(--sub);
+  line-height:1.7;
+}
+textarea {
+  width:100%;
+  min-height:210px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  resize:vertical;
+  outline:none;
+  line-height:1.8;
+  font-size:14px;
+  color:var(--text);
+}
+textarea:focus { border-color:var(--accent); }
+.btn {
+  border:0;
+  border-radius:12px;
+  padding:15px;
+  width:100%;
+  font-weight:700;
+  font-size:14px;
+  margin-top:10px;
+}
+.primary { background:var(--accent); color:white; }
+.secondary { background:var(--accent-bg); color:#547ba9; }
+.ghost {
+  background:white;
+  border:1px solid var(--line);
+  color:var(--sub);
+}
+.hidden { display:none !important; }
+.progress-info {
+  display:flex;
+  justify-content:space-between;
+  color:var(--sub);
+  font-size:12px;
+  margin-bottom:10px;
+}
+.progress {
+  height:6px;
+  background:var(--line);
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:22px;
+}
+.bar {
+  height:100%;
+  background:var(--accent);
+  width:0%;
+  transition:width .2s;
+}
+.match-title {
+  text-align:center;
+  font-size:13px;
+  color:var(--sub);
+  margin:25px 0 17px;
+}
+.match {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.song {
+  min-height:155px;
+  border:1px solid var(--line);
+  background:white;
+  border-radius:15px;
+  padding:18px 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:12px;
+  color:var(--text);
+  transition:.15s;
+}
+.song:active {
+  transform:scale(.97);
+  background:var(--accent-bg);
+}
+.song .vs {
+  color:var(--accent);
+  font-size:11px;
+  font-weight:800;
+}
+.song .name {
+  font-weight:750;
+  font-size:15px;
+  line-height:1.5;
+  word-break:keep-all;
+}
+.song small { color:var(--sub); font-size:11px; }
+#round {
+  font-size:12px;
+  color:var(--sub);
+  text-align:center;
+  margin-top:18px;
+}
+.result-row {
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:12px 3px;
+  border-bottom:1px solid var(--line);
+}
+.rank {
+  width:32px;
+  height:32px;
+  flex-shrink:0;
+  display:grid;
+  place-items:center;
+  background:var(--accent-bg);
+  color:#547ba9;
+  border-radius:9px;
+  font-weight:800;
+  font-size:13px;
+}
+.song-title { font-size:14px; font-weight:650; }
+.result-row:first-of-type .rank {
+  background:#e8d7a5;
+  color:#735719;
+}
+.actions {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+footer {
+  text-align:center;
+  color:#a6abb5;
+  font-size:11px;
+  margin-top:30px;
+  letter-spacing:1px;
+}
+@media(max-width:380px) {
+  h1 {font-size:24px;}
+  .song {min-height:135px;padding:12px 6px;}
+  .song .name {font-size:13px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">NAM WOOHYUN</div>
+  <h1>SONG SORT</h1>
+  <div class="subtitle">나무의 모든 노래, 나의 취향으로 정렬하기</div>
+</header>
+
+<section id="setup" class="card">
+  <h2>01. SONG LIST</h2>
+  <p class="desc">
+    노래 제목을 한 줄에 하나씩 입력해 주세요.<br>
+    중복된 제목은 자동으로 한 곡만 등록됩니다.
+  </p>
+  <textarea id="songInput"
+    placeholder="여백&#10;DEVIL&#10;P.O.V&#10;View&#10;Sunset Road"></textarea>
+  <div id="count" class="desc" style="margin-top:8px">
+    등록된 곡: 0곡
+  </div>
+  <button class="btn primary" onclick="startSort()">
+    소트 시작하기
+  </button>
+  <button id="resumeBtn" class="btn secondary hidden"
+    onclick="resumeSort()">이어서 진행하기</button>
+</section>
+
+<section id="game" class="card hidden">
+  <div class="progress-info">
+    <span>SONG SORT 진행률</span>
+    <span id="progressText">0%</span>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="match-title">
+    둘 중 더 좋아하는 곡을 선택해 주세요
+  </div>
+
+  <div class="match">
+    <button class="song" id="left" onclick="choose('left')">
+      <span class="vs">OPTION A</span>
+      <span class="name" id="leftName"></span>
+      <small>이 곡이 더 좋아!</small>
+    </button>
+    <button class="song" id="right" onclick="choose('right')">
+      <span class="vs">OPTION B</span>
+      <span class="name" id="rightName"></span>
+      <small>이 곡이 더 좋아!</small>
+    </button>
+  </div>
+  <div id="round"></div>
+  <button class="btn ghost" onclick="confirmExit()">
+    처음 화면으로
+  </button>
+</section>
+
+<section id="result" class="card hidden">
+  <div style="text-align:center">
+    <div class="logo">SORT COMPLETE</div>
+    <h2 style="font-size:24px;margin:12px 0">나의 남우현 SONG RANKING</h2>
+    <p class="desc" id="resultCount"></p>
+  </div>
+  <div id="ranking" style="margin-top:20px"></div>
+  <div class="actions" style="margin-top:20px">
+    <button class="btn secondary" onclick="copyResult()">
+      순위 복사
+    </button>
+    <button class="btn secondary" onclick="saveImage()">
+      이미지 저장
+    </button>
+  </div>
+  <button class="btn ghost" onclick="resetAll()">
+    새로운 소트 시작
+  </button>
+</section>
+
+<footer>NAM WOOHYUN SONG SORT · MADE FOR NAMU</footer>
+</div>
+
+<script>
+const KEY = "namwoohyun_song_sort_v1";
+
+let songs = [];
+let order = [];
+let queue = [];
+let cursor = 0;
+let candidate = null;
+let lo = 0;
+let hi = 0;
+let mid = 0;
+let complete = false;
+
+const $ = id => document.getElementById(id);
+
+function saveState() {
+  localStorage.setItem(KEY, JSON.stringify({
+    songs, order, queue, cursor, candidate, lo, hi, complete
+  }));
+}
+
+function loadState() {
+  try {
+    const data = JSON.parse(localStorage.getItem(KEY));
+    if (!data || !Array.isArray(data.songs)) return null;
+    return data;
+  } catch(e) {
+    return null;
+  }
+}
+
+function restoreState(data) {
+  songs = data.songs;
+  order = data.order;
+  queue = data.queue;
+  cursor = data.cursor;
+  candidate = data.candidate;
+  lo = data.lo;
+  hi = data.hi;
+  complete = data.complete;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startSort() {
+  const list = $("songInput").value
+    .split(/\r?\n/)
+    .map(x => x.trim())
+    .filter(Boolean);
+
+  songs = [...new Set(list)];
+
+  if (songs.length < 2) {
+    alert("최소 2곡 이상 입력해 주세요!");
+    return;
+  }
+
+  if (!confirm(songs.length + "곡으로 소트를 시작할까요?")) return;
+
+  order = [];
+  queue = shuffle(songs.map((_, i) => i));
+  cursor = 0;
+  candidate = null;
+  lo = 0;
+  hi = 0;
+  complete = false;
+
+  saveState();
+  $("setup").classList.add("hidden");
+  $("result").classList.add("hidden");
+  $("game").classList.remove("hidden");
+  nextMatch();
+}
+
+function resumeSort() {
+  const data = loadState();
+  if (!data) return;
+
+  restoreState(data);
+  $("setup").classList.add("hidden");
+
+  if (complete) {
+    showResult();
+    return;
+  }
+
+  $("game").classList.remove("hidden");
+  nextMatch();
+}
+
+function nextMatch() {
+  while (cursor < queue.length) {
+    candidate = queue[cursor];
+
+    if (lo >= hi) {
+      order.splice(lo, 0, candidate);
+      cursor++;
+      lo = 0;
+      hi = order.length;
+      continue;
+    }
+
+    mid = Math.floor((lo + hi) / 2);
+
+    $("leftName").textContent = songs[candidate];
+    $("rightName").textContent = songs[order[mid]];
+
+    const percent = Math.floor(
+      cursor / songs.length * 100
+    );
+    $("bar").style.width = percent + "%";
+    $("progressText").textContent = percent + "%";
+    $("round").textContent =
+      "현재 " + (cursor + 1) + " / " + songs.length +
+      "곡 정렬 중 · " + order.length + "곡 순위 확정";
+
+    saveState();
+    return;
+  }
+
+  complete = true;
+  saveState();
+  showResult();
+}
+
+function choose(side) {
+  if (complete || cursor >= queue.length) return;
+
+  if (side === "left") {
+    // 새 곡을 기존 곡보다 높은 순위에 배치
+    hi = mid;
+  } else {
+    lo = mid + 1;
+  }
+
+  nextMatch();
+}
+
+function showResult() {
+  $("game").classList.add("hidden");
+  $("setup").classList.add("hidden");
+  $("result").classList.remove("hidden");
+
+  $("resultCount").textContent =
+    songs.length + "곡의 취향 순위가 완성되었습니다.";
+
+  $("bar").style.width = "100%";
+  $("progressText").textContent = "100%";
+
+  $("ranking").innerHTML = order.map((index, i) => `
+    <div class="result-row">
+      <div class="rank">${i + 1}</div>
+      <div class="song-title"></div>
+    </div>
+  `).join("");
+
+  [...$("ranking").children].forEach((el, i) => {
+    el.querySelector(".song-title").textContent = songs[order[i]];
+  });
+}
+
+function copyResult() {
+  const text = order.map((index, i) =>
+    (i + 1) + "위. " + songs[index]
+  ).join("\n");
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert("전체 순위를 복사했어요!"))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  document.body.appendChild(area);
+  area.select();
+  document.execCommand("copy");
+  area.remove();
+  alert("전체 순위를 복사했어요!");
+}
+
+function saveImage() {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const width = 900;
+  const height = Math.max(500, 180 + order.length * 48);
+
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx.fillStyle = "#f7f8fa";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#7397c7";
+  ctx.font = "bold 22px sans-serif";
+  ctx.fillText("NAM WOOHYUN", width/2, 55);
+
+  ctx.fillStyle = "#252a34";
+  ctx.font = "bold 38px sans-serif";
+  ctx.fillText("MY SONG RANKING", width/2, 105);
+
+  ctx.textAlign = "left";
+
+  order.forEach((index, i) => {
+    const y = 165 + i * 48;
+
+    ctx.fillStyle = "#edf3fa";
+    ctx.fillRect(65, y - 27, 55, 36);
+
+    ctx.fillStyle = "#547ba9";
+    ctx.font = "bold 18px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(String(i + 1), 92, y - 3);
+
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#252a34";
+    ctx.font = "18px sans-serif";
+    ctx.fillText(songs[index], 145, y - 3);
+  });
+
+  const link = document.createElement("a");
+  link.download = "namwoohyun-song-ranking.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
+function confirmExit() {
+  if (!confirm("진행 상황은 저장됩니다. 처음 화면으로 이동할까요?"))
+    return;
+
+  $("game").classList.add("hidden");
+  $("setup").classList.remove("hidden");
+}
+
+function resetAll() {
+  if (!confirm("저장된 순위와 진행 상황을 모두 삭제할까요?"))
+    return;
+
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+$("songInput").addEventListener("input", () => {
+  const list = $("songInput").value
+    .split(/\r?\n/)
+    .map(x => x.trim())
+    .filter(Boolean);
+  $("count").textContent =
+    "등록된 곡: " + new Set(list).size + "곡";
+});
+
+function initialize() {
+  const data = loadState();
+
+  if (data) {
+    $("songInput").value = data.songs.join("\n");
+    $("count").textContent =
+      "등록된 곡: " + data.songs.length + "곡";
+
+    if (!data.complete && data.cursor < data.queue.length) {
+      $("resumeBtn").classList.remove("hidden");
+    }
+
+    if (data.complete) {
+      $("resumeBtn").classList.remove("hidden");
+      $("resumeBtn").textContent = "완성된 순위 확인하기";
+    }
+  }
+}
+
+initialize();
+</script>
+</body>
+</html>
